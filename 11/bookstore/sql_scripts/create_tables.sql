@@ -1,0 +1,35 @@
+CREATE TABLE Authors (
+  AuthorID INTEGER PRIMARY KEY,
+  Name TEXT NOT NULL
+);
+
+CREATE TABLE Books (
+  BookID INTEGER PRIMARY KEY,
+  Title TEXT NOT NULL,
+  AuthorID INTEGER,
+  Price REAL NOT NULL,
+  InventoryCount INTEGER NOT NULL,
+  FOREIGN KEY (AuthorID) REFERENCES Authors(AuthorID)
+);
+
+CREATE TABLE Customers (
+  CustomerID INTEGER PRIMARY KEY,
+  Name TEXT NOT NULL,
+  Email TEXT UNIQUE NOT NULL
+);
+
+CREATE TABLE Orders (
+  OrderID INTEGER PRIMARY KEY,
+  CustomerID INTEGER,
+  OrderDate TEXT NOT NULL,
+  FOREIGN KEY (CustomerID) REFERENCES Customers(CustomerID)
+);
+
+CREATE TABLE OrderDetails (
+  OrderDetailID INTEGER PRIMARY KEY,
+  OrderID INTEGER,
+  BookID INTEGER,
+  Quantity INTEGER NOT NULL,
+  FOREIGN KEY (OrderID) REFERENCES Orders(OrderID),
+  FOREIGN KEY (BookID) REFERENCES Books(BookID)
+);

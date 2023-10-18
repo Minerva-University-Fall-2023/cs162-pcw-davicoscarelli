@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?><sqlb_project><db path="/Users/davicoscarelli/Documents/GitHub/cs162-pcw-davicoscarelli/11/fitness/database/db.db" readonly="0" foreign_keys="1" case_sensitive_like="0" temp_store="0" wal_autocheckpoint="1000" synchronous="2"/><attached/><window><main_tabs open="structure browser pragmas query" current="3"/></window><tab_structure><column_width id="0" width="300"/><column_width id="1" width="0"/><column_width id="2" width="100"/><column_width id="3" width="1204"/><column_width id="4" width="0"/><expanded_item id="0" parent="1"/><expanded_item id="1" parent="1"/><expanded_item id="2" parent="1"/><expanded_item id="3" parent="1"/></tab_structure><tab_browse><current_table name="4,5:mainUsers"/><default_encoding codec=""/><browse_table_settings><table schema="main" name="Attendance" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_"><sort/><column_widths><column index="1" value="79"/><column index="2" value="43"/><column index="3" value="47"/><column index="4" value="92"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table><table schema="main" name="Bookings" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_"><sort/><column_widths><column index="1" value="61"/><column index="2" value="43"/><column index="3" value="47"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table><table schema="main" name="Classes" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_"><sort/><column_widths><column index="1" value="47"/><column index="2" value="66"/><column index="3" value="97"/><column index="4" value="54"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table><table schema="main" name="Users" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_"><sort/><column_widths><column index="1" value="43"/><column index="2" value="38"/><column index="3" value="107"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table></browse_table_settings></tab_browse><tab_sql><sql name="create_tables.sql">CREATE TABLE Users (
+  UserID INTEGER PRIMARY KEY,
+  Name TEXT NOT NULL,
+  Email TEXT UNIQUE NOT NULL
+);
+
+CREATE TABLE Classes (
+  ClassID INTEGER PRIMARY KEY,
+  ClassName TEXT NOT NULL,
+  Schedule TEXT NOT NULL,
+  Capacity INTEGER NOT NULL
+);
+
+CREATE TABLE Bookings (
+  BookingID INTEGER PRIMARY KEY,
+  UserID INTEGER,
+  ClassID INTEGER,
+  FOREIGN KEY (UserID) REFERENCES Users(UserID),
+  FOREIGN KEY (ClassID) REFERENCES Classes(ClassID)
+);
+
+CREATE TABLE Attendance (
+  AttendanceID INTEGER PRIMARY KEY,
+  UserID INTEGER,
+  ClassID INTEGER,
+  AttendanceDate TEXT NOT NULL,
+  FOREIGN KEY (UserID) REFERENCES Users(UserID),
+  FOREIGN KEY (ClassID) REFERENCES Classes(ClassID)
+);
+</sql><sql name="insert_mock.sql">-- Inserting Users
+INSERT INTO Users (Name, Email) VALUES ('Alice', 'alice@example.com');
+INSERT INTO Users (Name, Email) VALUES ('Bob', 'bob@example.com');
+
+-- Inserting Classes
+INSERT INTO Classes (ClassName, Schedule, Capacity) VALUES ('Yoga', 'Monday 10:00', 15);
+INSERT INTO Classes (ClassName, Schedule, Capacity) VALUES ('Zumba', 'Wednesday 18:00', 20);
+
+-- Inserting Bookings
+INSERT INTO Bookings (UserID, ClassID) VALUES (1, 1);
+INSERT INTO Bookings (UserID, ClassID) VALUES (2, 2);
+
+-- Inserting Attendance
+INSERT INTO Attendance (UserID, ClassID, AttendanceDate) VALUES (1, 1, '2023-10-10');
+INSERT INTO Attendance (UserID, ClassID, AttendanceDate) VALUES (2, 2, '2023-10-09');
+</sql><sql name="queries.sql">-- 1. Classes with available spots
+SELECT ClassName, Capacity - COUNT(Bookings.BookingID) AS AvailableSpots
+FROM Classes
+LEFT JOIN Bookings ON Classes.ClassID = Bookings.ClassID
+GROUP BY Classes.ClassID
+HAVING AvailableSpots &gt; 0;
+
+-- 2. Users who attended a specific class (ClassID = 1) on a particular date ('2023-10-10')
+SELECT Users.Name
+FROM Attendance
+JOIN Users ON Attendance.UserID = Users.UserID
+WHERE Attendance.ClassID = 1 AND Attendance.AttendanceDate = '2023-10-10';
+
+-- 3. Attendance rate of a user (UserID = 1)
+SELECT (CAST(COUNT(Attendance.AttendanceID) AS REAL) / (SELECT COUNT(*) FROM Classes)) * 100 AS AttendanceRate
+FROM Attendance
+WHERE Attendance.UserID = 1;
+</sql><current_tab id="2"/></tab_sql></sqlb_project>

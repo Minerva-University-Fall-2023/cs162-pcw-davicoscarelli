@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?><sqlb_project><db path="/Users/davicoscarelli/Documents/GitHub/cs162-pcw-davicoscarelli/11/bookstore/database/db.db" readonly="0" foreign_keys="1" case_sensitive_like="0" temp_store="0" wal_autocheckpoint="1000" synchronous="2"/><attached/><window><main_tabs open="structure browser pragmas query" current="3"/></window><tab_structure><column_width id="0" width="300"/><column_width id="1" width="0"/><column_width id="2" width="100"/><column_width id="3" width="1197"/><column_width id="4" width="0"/><expanded_item id="0" parent="1"/><expanded_item id="1" parent="1"/><expanded_item id="2" parent="1"/><expanded_item id="3" parent="1"/></tab_structure><tab_browse><current_table name="4,7:mainAuthors"/><default_encoding codec=""/><browse_table_settings><table schema="main" name="Authors" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_"><sort/><column_widths><column index="1" value="54"/><column index="2" value="80"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table><table schema="main" name="Books" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_"><sort/><column_widths><column index="1" value="45"/><column index="2" value="105"/><column index="3" value="54"/><column index="4" value="35"/><column index="5" value="88"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table><table schema="main" name="OrderDetails" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_"><sort/><column_widths><column index="1" value="79"/><column index="2" value="49"/><column index="3" value="45"/><column index="4" value="53"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table><table schema="main" name="Orders" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_"><sort/><column_widths><column index="1" value="49"/><column index="2" value="70"/><column index="3" value="70"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table></browse_table_settings></tab_browse><tab_sql><sql name="create_tables.sql">CREATE TABLE Authors (
+  AuthorID INTEGER PRIMARY KEY,
+  Name TEXT NOT NULL
+);
+
+CREATE TABLE Books (
+  BookID INTEGER PRIMARY KEY,
+  Title TEXT NOT NULL,
+  AuthorID INTEGER,
+  Price REAL NOT NULL,
+  InventoryCount INTEGER NOT NULL,
+  FOREIGN KEY (AuthorID) REFERENCES Authors(AuthorID)
+);
+
+CREATE TABLE Customers (
+  CustomerID INTEGER PRIMARY KEY,
+  Name TEXT NOT NULL,
+  Email TEXT UNIQUE NOT NULL
+);
+
+CREATE TABLE Orders (
+  OrderID INTEGER PRIMARY KEY,
+  CustomerID INTEGER,
+  OrderDate TEXT NOT NULL,
+  FOREIGN KEY (CustomerID) REFERENCES Customers(CustomerID)
+);
+
+CREATE TABLE OrderDetails (
+  OrderDetailID INTEGER PRIMARY KEY,
+  OrderID INTEGER,
+  BookID INTEGER,
+  Quantity INTEGER NOT NULL,
+  FOREIGN KEY (OrderID) REFERENCES Orders(OrderID),
+  FOREIGN KEY (BookID) REFERENCES Books(BookID)
+);
+</sql><sql name="insert_mock.sql">-- Inserting Authors
+INSERT INTO Authors (Name) VALUES ('J.K. Rowling');
+INSERT INTO Authors (Name) VALUES ('George Orwell');
+INSERT INTO Authors (Name) VALUES ('Jane Austen');
+
+-- Inserting Books
+INSERT INTO Books (Title, AuthorID, Price, InventoryCount) VALUES ('Harry Potter', 1, 20.00, 10);
+INSERT INTO Books (Title, AuthorID, Price, InventoryCount) VALUES ('1984', 2, 15.00, 5);
+INSERT INTO Books (Title, AuthorID, Price, InventoryCount) VALUES ('Pride and Prejudice', 3, 12.00, 0);
+
+-- Inserting Customers
+INSERT INTO Customers (Name, Email) VALUES ('John Doe', 'john.doe@example.com');
+INSERT INTO Customers (Name, Email) VALUES ('Jane Doe', 'jane.doe@example.com');
+
+-- Inserting Orders
+INSERT INTO Orders (CustomerID, OrderDate) VALUES (1, '2023-10-10');
+INSERT INTO Orders (CustomerID, OrderDate) VALUES (2, '2023-10-09');
+
+-- Inserting OrderDetails
+INSERT INTO OrderDetails (OrderID, BookID, Quantity) VALUES (1, 1, 2);
+INSERT INTO OrderDetails (OrderID, BookID, Quantity) VALUES (2, 3, 1);
+</sql><sql name="queries.sql">-- 1. Books low in inventory
+SELECT Title FROM Books WHERE InventoryCount &lt; 5;
+
+-- 2. Total spending per customer
+SELECT Customers.Name, SUM(Books.Price * OrderDetails.Quantity)
+FROM Customers
+JOIN Orders ON Customers.CustomerID = Orders.CustomerID
+JOIN OrderDetails ON Orders.OrderID = OrderDetails.OrderID
+JOIN Books ON OrderDetails.BookID = Books.BookID
+GROUP BY Customers.CustomerID;
+
+-- 3. Books ordered by a specific customer (CustomerID = 1)
+SELECT Books.Title
+FROM Books
+JOIN OrderDetails ON Books.BookID = OrderDetails.BookID
+JOIN Orders ON OrderDetails.OrderID = Orders.OrderID
+WHERE Orders.CustomerID = 1;
+</sql><current_tab id="2"/></tab_sql></sqlb_project>
