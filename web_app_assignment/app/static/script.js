@@ -44,15 +44,38 @@ function fetchTasks() {
         });
 }
 
+function createSubtask(parentTaskId) {
+    const title = prompt("Enter subtask description:");
+    if (title) {
+        fetch('/tasks', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ title: title, parent_id: parentTaskId })
+        })
+        .then(response => response.json())
+        .then(data => {
+            fetchTasks(); // Refresh the tasks after adding a subtask
+        });
+    }
+}
+
 function createTaskElement(task) {
-  const taskElement = document.createElement('div');
-  taskElement.classList.add('card-list-item');
-  taskElement.dataset.id = task.id;
-  taskElement.innerHTML = `
-      <a href="#"><h6>${task.title}</h6></a>
-      <p class="mt-4 mb-0"></p>
-  `;
-  return taskElement;
+    
+    const taskElement = document.createElement('div');
+    taskElement.classList.add('card-list-item');
+    taskElement.dataset.id = task.id;
+
+    if (task.parent_id) {
+        taskElement.classList.add('subtask');
+    }
+    taskElement.innerHTML = `
+        <a href="#"><h6>${task.title}</h6></a>
+        <button onclick="createSubtask(${task.id})">Add Subtask</button>
+        <p class="mt-4 mb-0"></p>
+    `;
+    return taskElement;
 }
 
 function updateTaskColumn(taskId, column) {

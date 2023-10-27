@@ -66,6 +66,12 @@ body {
   margin: 0 !important;
 }
 
+.subtask {
+  margin-left: 20px;
+  border-left: 2px solid #ddd;
+  padding-left: 10px;
+}
+
 .auth-container {
   background-color: #222222;
   padding: 20px;
