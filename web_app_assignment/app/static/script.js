@@ -67,6 +67,12 @@ function createSubtask(parentTaskId) {
     });
 }
 
+let parentTaskId = null;
+
+function setParentTaskId(id) {
+    parentTaskId = id;
+}
+
 function createTaskElement(task) {
     
     const taskElement = document.createElement('div');
@@ -82,10 +88,14 @@ function createTaskElement(task) {
   `;
     const subtaskButton = document.createElement('button');
     subtaskButton.innerHTML = '<i class="fas fa-plus"></i>';
-    subtaskButton.onclick = function() { createSubtask(task.id); };
+    subtaskButton.setAttribute('data-toggle', 'modal');
+    subtaskButton.setAttribute('data-target', '#subtaskModal');
+    subtaskButton.onclick = function() { setParentTaskId(task.id); }; // Set the parent task ID when the button is clicked
     taskElement.appendChild(subtaskButton);
     return taskElement;
 }
+
+
 
 function updateTaskColumn(taskId, column) {
   fetch(`/tasks/${taskId}`, {
