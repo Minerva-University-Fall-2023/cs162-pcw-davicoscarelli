@@ -87,6 +87,10 @@ body {
   z-index: 1;
 }
 
+.sub-subtask {
+  background: #dadada; /* Light grey */
+}
+
 .task-button {
   margin: 0; 
   padding: 0; /* Adjust padding if necessary */

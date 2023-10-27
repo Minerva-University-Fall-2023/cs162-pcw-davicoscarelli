@@ -26,19 +26,18 @@ function fetchTasks() {
         .then(response => response.json())
         .then(tasks => {
             tasks.forEach(task => {
-                console.log("AAAAAAA", task)
                 const column = document.getElementById(task.column);
                 if (column) {
                     const columnBody = column.querySelector('.card-list-body');
-                    const taskElement = createTaskElement(task);
+                    const taskElement = createTaskElement({...task, depth: 0}); // Main task with depth 0
                     columnBody.appendChild(taskElement);
                     if (task.subtasks && task.subtasks.length > 0) {
                         task.subtasks.forEach(subtask => {
-                            const subtaskElement = createTaskElement({...subtask, parent_id: task.id});
+                            const subtaskElement = createTaskElement({...subtask, parent_id: task.id, depth: 1}); // Subtask with depth 1
                             taskElement.appendChild(subtaskElement);
                             if (subtask.subtasks && subtask.subtasks.length > 0) {
                                 subtask.subtasks.forEach(subtask2 => {
-                                    const subtaskElement2 = createTaskElement({...subtask2, parent_id: subtask.id});
+                                    const subtaskElement2 = createTaskElement({...subtask2, parent_id: subtask.id, depth: 2}); // Sub-subtask with depth 2
                                     subtaskElement.appendChild(subtaskElement2);
                                 });
                             }
@@ -53,6 +52,7 @@ function fetchTasks() {
 
 
 
+
 function setParentTaskId(taskId) {
     localStorage.setItem('parentTaskId', taskId);
     // $('#subtaskModal').modal('show');
@@ -62,8 +62,10 @@ function createTaskElement(task) {
     taskElement.classList.add('card-list-item');
     taskElement.dataset.id = task.id;
 
-    if (task.parent_id) {
+    if (task.depth === 1) {
         taskElement.classList.add('subtask');
+    } else if (task.depth === 2) {
+        taskElement.classList.add('sub-subtask');
     }
 
     // Create a container div for title and buttons
@@ -74,28 +76,30 @@ function createTaskElement(task) {
     taskTitle.href = '#';
     taskTitle.innerHTML = `<h6>${task.title}</h6>`;
 
-    // Create New Subtask button
-    const newSubtaskButton = document.createElement('button');
-    newSubtaskButton.innerHTML = '<i class="fas fa-plus"></i>';
-    newSubtaskButton.classList.add('btn', 'btn-sm', 'btn-outline-secondary', 'task-button');
-    newSubtaskButton.setAttribute('data-toggle', 'modal');
-    newSubtaskButton.setAttribute('data-target', '#subtaskModal');
-    newSubtaskButton.onclick = function() { setParentTaskId(task.id); };
+    // Append title to the container
+    taskContainer.appendChild(taskTitle);
+
+    // Only add the "New Subtask" button if the task depth is less than 2
+    if (task.depth < 2) {
+        const newSubtaskButton = document.createElement('button');
+        newSubtaskButton.innerHTML = '<i class="fas fa-plus"></i>';
+        newSubtaskButton.classList.add('btn', 'btn-sm', 'btn-outline-secondary', 'task-button');
+        newSubtaskButton.setAttribute('data-toggle', 'modal');
+        newSubtaskButton.setAttribute('data-target', '#subtaskModal');
+        newSubtaskButton.onclick = function() { setParentTaskId(task.id); };
+        taskContainer.appendChild(newSubtaskButton);
+    }
 
     // Create Edit button
     const editTaskButton = document.createElement('button');
     editTaskButton.innerHTML = '<i class="fas fa-edit"></i>';
     editTaskButton.classList.add('btn', 'btn-sm', 'btn-outline-secondary', 'task-button');
+    taskContainer.appendChild(editTaskButton);
 
     // Create Delete button
     const deleteTaskButton = document.createElement('button');
     deleteTaskButton.innerHTML = '<i class="fas fa-trash"></i>';
     deleteTaskButton.classList.add('btn', 'btn-sm', 'btn-outline-secondary', 'task-button');
-
-    // Append title and buttons to the container
-    taskContainer.appendChild(taskTitle);
-    taskContainer.appendChild(newSubtaskButton);
-    taskContainer.appendChild(editTaskButton);
     taskContainer.appendChild(deleteTaskButton);
 
     // Append container to task element
@@ -103,6 +107,7 @@ function createTaskElement(task) {
 
     return taskElement;
 }
+
 
 
 // function createTaskElement(task) {
