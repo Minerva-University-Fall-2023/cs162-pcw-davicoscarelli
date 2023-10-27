@@ -24,7 +24,7 @@ def create_task():
 @app.route('/tasks', methods=['GET'])
 @login_required
 def get_tasks():
-    tasks = Task.query.all()
+    tasks = Task.query.filter_by(user_id=current_user.id).all()
     print(current_user.username)
     return jsonify([task.to_dict() for task in tasks])
 
