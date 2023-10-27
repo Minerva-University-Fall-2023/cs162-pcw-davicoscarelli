@@ -1,24 +1,35 @@
 document.addEventListener("DOMContentLoaded", function() {
-  fetchTasks();
+    fetchTasks();
 
-  var kanban = {
-      sortableKanbanCards: new Draggable.Sortable(document.querySelectorAll('.kanban-col .card-list-body'), {
-          plugins: [SwapAnimation.default],
-          draggable: '.card-list-item',
-          handle: '.card-list-item',
-          appendTo: 'body',
-          cursor: "grabbing",
-          mirror: {
-              constrainDimensions: true,
-          },
-      })
-  };
+    var kanban = {
+        sortableKanbanCards: new Draggable.Sortable(document.querySelectorAll('.kanban-col .card-list-body'), {
+            plugins: [SwapAnimation.default],
+            draggable: '.card-list-item',
+            handle: '.card-list-item',
+            appendTo: 'body',
+            cursor: "grabbing",
+            mirror: {
+                constrainDimensions: true,
+            },
+        })
+    };
 
-  kanban.sortableKanbanCards.on('sortable:stop', (event) => {
-      const taskId = event.data.dragEvent.data.source.dataset.id;
-      const newColumn = event.data.newContainer.parentElement.querySelector('.card-list-header').textContent.trim();
-      updateTaskColumn(taskId, newColumn);
-  });
+    kanban.sortableKanbanCards.on('sortable:stop', (event) => {
+        const taskId = event.data.dragEvent.data.source.dataset.id;
+        const newColumn = event.data.newContainer.parentElement.querySelector('.card-list-header').textContent.trim();
+        
+        // Check if the task was moved to a column or to another task
+        if (event.data.newContainer.classList.contains('card-list-body')) {
+            // Moved to a column, make it a standalone task
+            updateTaskParent(taskId, null, newColumn);
+        } else {
+            // Moved to another task, update its parent ID
+            const newParentId = event.data.newContainer.dataset.id;
+            updateTaskParent(taskId, newParentId, newColumn);
+        }
+
+        // updateTaskColumn(taskId, newColumn);
+    });
 });
 
 function fetchTasks() {
@@ -282,4 +293,18 @@ function updateTaskColumn(taskId, column) {
   .then(data => {
       console.log(`Task ${data.id} moved to ${data.column}`);
   });
+}
+
+function updateTaskParent(taskId, parentId, column) {
+    fetch(`/tasks/${taskId}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ parent_id: parentId, column: column })
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log(`Task ${data.id} parent updated to ${data.parent_id}`);
+    });
 }
