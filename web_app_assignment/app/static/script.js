@@ -44,35 +44,12 @@ function fetchTasks() {
         });
 }
 
-function createSubtask() {
-    const subtaskTitle = document.getElementById('subtask-title').value;
-    const subtaskDescription = document.getElementById('subtask-description').value;
 
-    fetch('/create_task', {
-        method: 'POST',
-        body: JSON.stringify({
-            title: subtaskTitle,
-            description: subtaskDescription,
-            parent_id: parentTaskId  // Send the parent task ID
-        }),
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            fetchTasks();  // Refresh the tasks list
-            $('#subtaskModal').modal('hide');  // Close the modal
-        } else {
-            alert('Error creating subtask.');
-        }
-    });
-}
 
 let parentTaskId = null;
 
 function setParentTaskId(id) {
+    console.log("AAAAAA", id)
     parentTaskId = id;
 }
 
@@ -96,6 +73,32 @@ function createTaskElement(task) {
     subtaskButton.onclick = function() { setParentTaskId(task.id); }; // Set the parent task ID when the button is clicked
     taskElement.appendChild(subtaskButton);
     return taskElement;
+}
+
+function createSubtask() {
+    const subtaskTitle = document.getElementById('subtask-title').value;
+    const subtaskDescription = document.getElementById('subtask-description').value;
+    console.log("FILHA DA PUTAAA:", parentTaskId)
+    fetch('/create_task', {
+        method: 'POST',
+        body: JSON.stringify({
+            title: subtaskTitle,
+            description: subtaskDescription,
+            parent_id: parentTaskId  // Ensure the parent task ID is sent
+        }),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            fetchTasks();  // Refresh the tasks list
+            $('#subtaskModal').modal('hide');  // Close the modal
+        } else {
+            alert('Error creating subtask.');
+        }
+    });
 }
 
 
