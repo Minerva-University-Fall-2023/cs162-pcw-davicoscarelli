@@ -53,7 +53,6 @@ function setParentTaskId(taskId) {
 
 
 function createTaskElement(task) {
-    
     const taskElement = document.createElement('div');
     taskElement.classList.add('card-list-item');
     taskElement.dataset.id = task.id;
@@ -61,49 +60,149 @@ function createTaskElement(task) {
     if (task.parent_id) {
         taskElement.classList.add('subtask');
     }
-    taskElement.innerHTML = `
-      <a href="#"><h6>${task.title}</h6></a>
-      <p class="mt-4 mb-0"></p>
-  `;
-    const subtaskButton = document.createElement('button');
-    subtaskButton.innerHTML = '<i class="fas fa-plus"></i>';
-    subtaskButton.setAttribute('data-toggle', 'modal');
-    subtaskButton.setAttribute('data-target', '#subtaskModal');
-    subtaskButton.onclick = function() { setParentTaskId(task.id); }; // Set the parent task ID when the button is clicked
-    taskElement.appendChild(subtaskButton);
+
+    // Create a container div for title and menu
+    const taskContainer = document.createElement('div');
+    taskContainer.classList.add('task-container');
+    
+    const taskTitle = document.createElement('a');
+    taskTitle.href = '#';
+    taskTitle.innerHTML = `<h6>${task.title}</h6>`;
+
+    const taskMenuButton = document.createElement('button');
+    taskMenuButton.innerHTML = '<i class="fas fa-ellipsis-v"></i>';
+    taskMenuButton.classList.add('btn', 'btn-sm', 'btn-outline-secondary', 'task-menu-button', 'dropdown-toggle');
+    taskMenuButton.setAttribute('data-toggle', 'dropdown');
+    taskMenuButton.setAttribute('aria-haspopup', 'true');
+    taskMenuButton.setAttribute('aria-expanded', 'false');
+    
+    const dropdownMenu = document.createElement('div');
+    dropdownMenu.classList.add('dropdown-menu'); // Add 'dropdown-menu-right' class
+
+    const newSubtaskButton = document.createElement('button');
+    newSubtaskButton.innerHTML = 'New Subtask';
+    newSubtaskButton.classList.add('dropdown-item');
+    newSubtaskButton.setAttribute('data-toggle', 'modal');
+    newSubtaskButton.setAttribute('data-target', '#subtaskModal');
+    newSubtaskButton.onclick = function() { setParentTaskId(task.id); }; // Set the parent task ID when the button is clicked
+    
+    const editTaskButton = document.createElement('button');
+    editTaskButton.innerHTML = 'Edit';
+    editTaskButton.classList.add('dropdown-item');
+    
+    const deleteTaskButton = document.createElement('button');
+    deleteTaskButton.innerHTML = 'Delete';
+    deleteTaskButton.classList.add('dropdown-item');
+
+    // Append buttons to dropdown menu
+    dropdownMenu.appendChild(newSubtaskButton);
+    dropdownMenu.appendChild(editTaskButton);
+    dropdownMenu.appendChild(deleteTaskButton);
+
+    // Append title and menu button to the container
+    taskContainer.appendChild(taskTitle);
+    taskContainer.appendChild(taskMenuButton);
+
+    // Append container and dropdown menu to task element
+    taskElement.appendChild(taskContainer);
+    taskElement.appendChild(dropdownMenu);
+
     return taskElement;
 }
 
-function createSubtask() {
-    const parentId = localStorage.getItem('parentTaskId');
-    const subtaskTitle = document.getElementById('subtaskTitle').value;
-    console.log("ENTROUUUU", parentId, subtaskTitle)
+
+// function createTaskElement(task) {
+//     const taskElement = document.createElement('div');
     
-    // const subtaskDescription = document.getElementById('subtask-description').value;
+//     taskElement.dataset.id = task.id;
+
+//     console.log(task)
+//     if (task.parent_id) {
+//         taskElement.classList.add('subtask', 'card-list-item');
+//     }else{
+//         taskElement.classList.add('card-list-item');
+//     }
     
 
-    fetch('/tasks', {
-        method: 'POST',
-        body: JSON.stringify({
-            title: subtaskTitle,
-            // description: subtaskDescription,
-            parent_id: parentId
-        }),
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            console.log("AAAAAA foooiii", data)
-            fetchTasks();  // Refresh the tasks list
-            $('#subtaskModal').modal('hide');  // Close the modal
-        } else {
-            alert('Error creating subtask.');
-        }
-    });
-}
+//     // Create a container div for title and menu
+//     const taskContainer = document.createElement('div');
+//     taskContainer.classList.add('task-container');
+    
+//     const taskTitle = document.createElement('a');
+//     taskTitle.href = '#';
+//     taskTitle.innerHTML = `<h6>${task.title}</h6>`;
+
+//     const taskMenuButton = document.createElement('button');
+//     taskMenuButton.innerHTML = '<i class="fas fa-ellipsis-v"></i>';
+//     taskMenuButton.classList.add('btn', 'btn-sm', 'btn-outline-secondary', 'task-menu-button');
+//     taskMenuButton.setAttribute('data-toggle', 'dropdown');
+    
+//     const dropdownMenu = document.createElement('div');
+//     dropdownMenu.classList.add('dropdown-menu', 'task-dropdown-menu', 'dropdown-menu-right'); // Add 'dropdown-menu-right' class
+
+//     const newSubtaskButton = document.createElement('button');
+//     newSubtaskButton.innerHTML = 'New Subtask';
+//     newSubtaskButton.classList.add('dropdown-item', 'edit-task');
+//     newSubtaskButton.setAttribute('data-toggle', 'modal');
+//     newSubtaskButton.setAttribute('data-target', '#subtaskModal');
+//     newSubtaskButton.onclick = function() { setParentTaskId(task.id); }; // Set the parent task ID when the button is clicked
+    
+//     const editTaskButton = document.createElement('button');
+//     editTaskButton.innerHTML = 'Edit';
+//     editTaskButton.classList.add('dropdown-item', 'edit-task');
+    
+//     const deleteTaskButton = document.createElement('button');
+//     deleteTaskButton.innerHTML = 'Delete';
+//     deleteTaskButton.classList.add('dropdown-item', 'delete-task');
+
+//     // Append buttons to dropdown menu
+//     dropdownMenu.appendChild(newSubtaskButton);
+//     dropdownMenu.appendChild(editTaskButton);
+//     dropdownMenu.appendChild(deleteTaskButton);
+
+//     // Append title and menu button to the container
+//     taskContainer.appendChild(taskTitle);
+//     taskContainer.appendChild(taskMenuButton);
+
+//     // Append container and dropdown menu to task element
+//     taskElement.appendChild(taskContainer);
+//     taskElement.appendChild(dropdownMenu);
+
+    
+
+//     return taskElement;
+// }
+
+// function createSubtask() {
+//     const parentId = localStorage.getItem('parentTaskId');
+//     const subtaskTitle = document.getElementById('subtaskTitle').value;
+//     console.log("ENTROUUUU", parentId, subtaskTitle)
+    
+//     // const subtaskDescription = document.getElementById('subtask-description').value;
+    
+
+//     fetch('/tasks', {
+//         method: 'POST',
+//         body: JSON.stringify({
+//             title: subtaskTitle,
+//             // description: subtaskDescription,
+//             parent_id: parentId
+//         }),
+//         headers: {
+//             'Content-Type': 'application/json'
+//         }
+//     })
+//     .then(response => response.json())
+//     .then(data => {
+//         if (data.success) {
+//             console.log("AAAAAA foooiii", data)
+//             fetchTasks();  // Refresh the tasks list
+//             $('#subtaskModal').modal('hide');  // Close the modal
+//         } else {
+//             alert('Error creating subtask.');
+//         }
+//     });
+// }
 
 
 
