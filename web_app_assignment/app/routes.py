@@ -38,29 +38,23 @@ def create_task():
 @login_required
 def get_tasks():
     tasks = Task.query.filter_by(user_id=current_user.id).all()
-    
-    # Create a dictionary to store tasks hierarchically
-    hierarchical_tasks = {}
-    
+
+    # Convert tasks to a dictionary for easy lookup
+    task_dict = {task.id: task.to_dict() for task in tasks}
+    for task in tasks:
+        task_dict[task.id]['subtasks'] = []
+
+    # Build the hierarchy
+    top_level_tasks = []
     for task in tasks:
         if task.parent_id is None:
-            # This is a top-level task
-            if task.id not in hierarchical_tasks:
-                hierarchical_tasks[task.id] = task.to_dict()
-                hierarchical_tasks[task.id]['subtasks'] = []
+            top_level_tasks.append(task_dict[task.id])
         else:
-            # This is a subtask, find its parent task
-            parent_task = Task.query.get(task.parent_id)
+            parent_task = task_dict.get(task.parent_id)
             if parent_task:
-                if parent_task.id not in hierarchical_tasks:
-                    hierarchical_tasks[parent_task.id] = parent_task.to_dict()
-                    hierarchical_tasks[parent_task.id]['subtasks'] = []
-                hierarchical_tasks[parent_task.id]['subtasks'].append(task.to_dict())
-    
-    # Convert the dictionary values to a list to return the hierarchical structure
-    hierarchical_task_list = list(hierarchical_tasks.values())
-    
-    return jsonify(hierarchical_task_list)
+                parent_task['subtasks'].append(task_dict[task.id])
+
+    return jsonify(top_level_tasks)
 
 @app.route('/tasks/<int:task_id>', methods=['PUT'])
 @login_required

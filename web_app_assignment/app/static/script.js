@@ -26,6 +26,7 @@ function fetchTasks() {
         .then(response => response.json())
         .then(tasks => {
             tasks.forEach(task => {
+                console.log("AAAAAAA", task)
                 const column = document.getElementById(task.column);
                 if (column) {
                     const columnBody = column.querySelector('.card-list-body');
@@ -35,6 +36,12 @@ function fetchTasks() {
                         task.subtasks.forEach(subtask => {
                             const subtaskElement = createTaskElement({...subtask, parent_id: task.id});
                             taskElement.appendChild(subtaskElement);
+                            if (subtask.subtasks && subtask.subtasks.length > 0) {
+                                subtask.subtasks.forEach(subtask2 => {
+                                    const subtaskElement2 = createTaskElement({...subtask2, parent_id: subtask.id});
+                                    subtaskElement.appendChild(subtaskElement2);
+                                });
+                            }
                         });
                     }
                 } else {
