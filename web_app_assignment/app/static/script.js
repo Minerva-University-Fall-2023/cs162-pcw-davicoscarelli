@@ -4,7 +4,6 @@ document.addEventListener("DOMContentLoaded", function() {
     let isSameColumn = false;
     let current_task = null;
     let target_task = null;
-    let target_column = null
 
     var kanban = {
         sortableKanbanCards: new Draggable.Sortable(document.querySelectorAll('.kanban-col .card-list-body'), {
@@ -24,34 +23,38 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 
     kanban.sortableKanbanCards.on('drag:over', (event) => {
-        console.log(event.data)
         current_task = event.data.originalSource.dataset.id;
         target_task = event.data.over.dataset.id;
 
-        console.log(event.data.over.parentElement.parentElement.querySelector('.card-list-header').textContent.trim())
-        target_column = event.data.over.parentElement.parentElement.querySelector('.card-list-header').textContent.trim()
-        // const originalColumn = event.data.dragEvent.data.source.parentElement.parentElement.querySelector('.card-list-header').textContent.trim();
-        // const newColumn = event.data.overContainer.parentElement.querySelector('.card-list-header').textContent.trim();
-        // console.log(originalColumn)
-        // console.log(newColumn)
-        // if (originalColumn !== newColumn) {
-        //     isSameColumn = false; // The task is being dragged to a different column
-        // }
+        const originalColumn = event.data.dragEvent.data.source.parentElement.parentElement.querySelector('.card-list-header').textContent.trim();
+        const newColumn = event.data.overContainer.parentElement.querySelector('.card-list-header').textContent.trim();
+
+        if (originalColumn !== newColumn) {
+            isSameColumn = false; // The task is being dragged to a different column
+        }
     });
 
     kanban.sortableKanbanCards.on('sortable:sort', (event) => {
         if (isSameColumn) {
+            // If it's the same column, prevent the sorting
             event.cancel();
         }
     });
 
     kanban.sortableKanbanCards.on('sortable:stop', (event) => {
-        console.log(target_column)
-        console.log(current_task)
-        console.log(target_task)
-        const newColumn = target_column
-        
-        updateTask(current_task, target_task, newColumn);
+        // const newColumn = event.data.newContainer.parentElement.querySelector('.card-list-header').textContent.trim();
+        const newColumn = "Doing"
+        // Check if the task was dropped inside another task
+        // if (target_task && !event.data.newContainer.classList.contains('card-list-body')) {
+            console.log("ENTROU 1")
+            console.log(current_task, target_task)
+            // The task was dropped on another task, so it should become a subtask of that task
+            updateTaskParent(current_task, target_task);
+        // } else {
+        //     console.log("ENTROU 2")
+        //     // The task was not dropped on another task, so it remains a standalone task
+        //     updateTaskParent(current_task, null, newColumn);
+        // }
     });
 });
 
@@ -148,20 +151,164 @@ function createTaskElement(task) {
 
 
 
-function updateTask(taskId, parentId, column) {
-    fetch(`/tasks/${taskId}`, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ parent_id: parentId, column: column })
-    })
-    .then(response => response.json())
-    .then(data => {
-        location.reload();
-        console.log(`Task ${data.id} parent updated to ${data.parent_id} and moved to ${data.column}`);
-    });
-}
+// function createTaskElement(task) {
+//     $('.dropdown-toggle').dropdown();
+
+//     const taskElement = document.createElement('div');
+//     taskElement.classList.add('card-list-item');
+//     taskElement.dataset.id = task.id;
+
+//     if (task.parent_id) {
+//         taskElement.classList.add('subtask');
+//     }
+
+//     // Create a container div for title and menu
+//     const taskContainer = document.createElement('div');
+//     taskContainer.classList.add('task-container');
+    
+//     const taskTitle = document.createElement('a');
+//     taskTitle.href = '#';
+//     taskTitle.innerHTML = `<h6>${task.title}</h6>`;
+
+//     const taskMenuButton = document.createElement('button');
+//     taskMenuButton.innerHTML = '<i class="fas fa-ellipsis-v"></i>';
+//     taskMenuButton.classList.add('btn', 'btn-sm', 'btn-outline-secondary', 'task-menu-button', 'dropdown-toggle');
+//     taskMenuButton.setAttribute('data-toggle', 'dropdown');
+//     taskMenuButton.setAttribute('aria-haspopup', 'true');
+//     taskMenuButton.setAttribute('aria-expanded', 'false');
+    
+//     const dropdownMenu = document.createElement('div');
+//     dropdownMenu.classList.add('dropdown-menu'); // Add 'dropdown-menu-right' class
+
+//     const newSubtaskButton = document.createElement('button');
+//     newSubtaskButton.innerHTML = 'New Subtask';
+//     newSubtaskButton.classList.add('dropdown-item');
+//     newSubtaskButton.setAttribute('data-toggle', 'modal');
+//     newSubtaskButton.setAttribute('data-target', '#subtaskModal');
+//     newSubtaskButton.onclick = function() { setParentTaskId(task.id); }; // Set the parent task ID when the button is clicked
+    
+//     const editTaskButton = document.createElement('button');
+//     editTaskButton.innerHTML = 'Edit';
+//     editTaskButton.classList.add('dropdown-item');
+    
+//     const deleteTaskButton = document.createElement('button');
+//     deleteTaskButton.innerHTML = 'Delete';
+//     deleteTaskButton.classList.add('dropdown-item');
+
+//     // Append buttons to dropdown menu
+//     dropdownMenu.appendChild(newSubtaskButton);
+//     dropdownMenu.appendChild(editTaskButton);
+//     dropdownMenu.appendChild(deleteTaskButton);
+
+//     // Append title and menu button to the container
+//     taskContainer.appendChild(taskTitle);
+//     taskContainer.appendChild(taskMenuButton);
+
+//     // Append container and dropdown menu to task element
+//     taskElement.appendChild(taskContainer);
+//     taskElement.appendChild(dropdownMenu);
+
+//     $(taskMenuButton).dropdown();
+
+
+//     return taskElement;
+// }
+
+
+// function createTaskElement(task) {
+//     const taskElement = document.createElement('div');
+    
+//     taskElement.dataset.id = task.id;
+
+//     console.log(task)
+//     if (task.parent_id) {
+//         taskElement.classList.add('subtask', 'card-list-item');
+//     }else{
+//         taskElement.classList.add('card-list-item');
+//     }
+    
+
+//     // Create a container div for title and menu
+//     const taskContainer = document.createElement('div');
+//     taskContainer.classList.add('task-container');
+    
+//     const taskTitle = document.createElement('a');
+//     taskTitle.href = '#';
+//     taskTitle.innerHTML = `<h6>${task.title}</h6>`;
+
+//     const taskMenuButton = document.createElement('button');
+//     taskMenuButton.innerHTML = '<i class="fas fa-ellipsis-v"></i>';
+//     taskMenuButton.classList.add('btn', 'btn-sm', 'btn-outline-secondary', 'task-menu-button');
+//     taskMenuButton.setAttribute('data-toggle', 'dropdown');
+    
+//     const dropdownMenu = document.createElement('div');
+//     dropdownMenu.classList.add('dropdown-menu', 'task-dropdown-menu', 'dropdown-menu-right'); // Add 'dropdown-menu-right' class
+
+//     const newSubtaskButton = document.createElement('button');
+//     newSubtaskButton.innerHTML = 'New Subtask';
+//     newSubtaskButton.classList.add('dropdown-item', 'edit-task');
+//     newSubtaskButton.setAttribute('data-toggle', 'modal');
+//     newSubtaskButton.setAttribute('data-target', '#subtaskModal');
+//     newSubtaskButton.onclick = function() { setParentTaskId(task.id); }; // Set the parent task ID when the button is clicked
+    
+//     const editTaskButton = document.createElement('button');
+//     editTaskButton.innerHTML = 'Edit';
+//     editTaskButton.classList.add('dropdown-item', 'edit-task');
+    
+//     const deleteTaskButton = document.createElement('button');
+//     deleteTaskButton.innerHTML = 'Delete';
+//     deleteTaskButton.classList.add('dropdown-item', 'delete-task');
+
+//     // Append buttons to dropdown menu
+//     dropdownMenu.appendChild(newSubtaskButton);
+//     dropdownMenu.appendChild(editTaskButton);
+//     dropdownMenu.appendChild(deleteTaskButton);
+
+//     // Append title and menu button to the container
+//     taskContainer.appendChild(taskTitle);
+//     taskContainer.appendChild(taskMenuButton);
+
+//     // Append container and dropdown menu to task element
+//     taskElement.appendChild(taskContainer);
+//     taskElement.appendChild(dropdownMenu);
+
+    
+
+//     return taskElement;
+// }
+
+// function createSubtask() {
+//     const parentId = localStorage.getItem('parentTaskId');
+//     const subtaskTitle = document.getElementById('subtaskTitle').value;
+//     console.log("ENTROUUUU", parentId, subtaskTitle)
+    
+//     // const subtaskDescription = document.getElementById('subtask-description').value;
+    
+
+//     fetch('/tasks', {
+//         method: 'POST',
+//         body: JSON.stringify({
+//             title: subtaskTitle,
+//             // description: subtaskDescription,
+//             parent_id: parentId
+//         }),
+//         headers: {
+//             'Content-Type': 'application/json'
+//         }
+//     })
+//     .then(response => response.json())
+//     .then(data => {
+//         if (data.success) {
+//             console.log("AAAAAA foooiii", data)
+//             fetchTasks();  // Refresh the tasks list
+//             $('#subtaskModal').modal('hide');  // Close the modal
+//         } else {
+//             alert('Error creating subtask.');
+//         }
+//     });
+// }
+
+
 
 
 function updateTaskColumn(taskId, column) {
@@ -178,27 +325,16 @@ function updateTaskColumn(taskId, column) {
   });
 }
 
-function updateTaskParent(taskId, newParentId = null, newColumn = null) {
-    const data = {
-        parent_id: newParentId,
-        column: newColumn
-    };
-
+function updateTaskParent(taskId, parentId) {
     fetch(`/tasks/${taskId}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(data)
+        body: JSON.stringify({ parent_id: parentId })
     })
     .then(response => response.json())
     .then(data => {
-        if (data.success) {
-            console.log(`Task ${taskId} updated successfully.`);
-            // Consider refreshing the Kanban board here to reflect the changes
-            location.reload();
-        } else {
-            console.error(`Failed to update task ${taskId}.`);
-        }
+        console.log(`Task ${data.id} parent updated to ${data.parent_id}`);
     });
 }
