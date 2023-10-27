@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8">
+  <title>Kanban - Davi Coscarelli</title>
+  <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/css/bootstrap.min.css'>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+</head>
+<body>
+  
+<div class="container my-4">
+  <h1 class="page-title">Davi's Kanban</h1>
+  <div class="row kanban-board">
+    <div class="col-3 kanban-col">
+      <div class="card-list" id="Backlog">
+        <div class="card-list-header">Backlog</div>
+        <div class="card-list-body">
+        </div>
+        <div class="card-list-footer">
+          <a href="#" data-toggle="modal" data-target="#exampleModal" class="btn btn-link">Add task</a>
+        </div>
+      </div>
+    </div>
+    <div class="col-3 kanban-col">
+      <div class="card-list" id="Doing">
+        <div class="card-list-header">Doing</div>
+        <div class="card-list-body">
+        </div>
+        <div class="card-list-footer">
+          <a href="#" data-toggle="modal" data-target="#exampleModal"  class="btn btn-link">Add task</a>
+        </div>
+      </div>
+    </div>
+    <div class="col-3 kanban-col">
+      <div class="card-list" id="Review">
+        <div class="card-list-header">Review</div>
+        <div class="card-list-body">
+        </div>
+        <div class="card-list-footer">
+          <a href="#" data-toggle="modal" data-target="#exampleModal"  class="btn btn-link">Add task</a>
+        </div>
+      </div>
+    </div>
+    <div class="col-3 kanban-col">
+      <div class="card-list" id="Done">
+        <div class="card-list-header">Done</div>
+        <div class="card-list-body">
+        </div>
+        <div class="card-list-footer">
+          <a href="#" data-toggle="modal" data-target="#exampleModal"  class="btn btn-link">Add task</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">New Task</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form class="modal-body" method="post" action="/tasks">
+        <label>Description:</label>
+        <textarea style="width:100%; height:10vh; border-radius: 10px;" name="title"></textarea>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-primary">Save changes</button>
+        </div>
+      </form>
+      
+      
+    </div>
+  </div>
+</div>
+
+<script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js'></script>
+<script src='https://cdn.jsdelivr.net/npm/@shopify/draggable@1.0.0-beta.8/lib/draggable.bundle.legacy.min.js'></script>
+<script src='https://cdn.jsdelivr.net/npm/@shopify/draggable@1.0.0-beta.8/lib/plugins/swap-animation.min.js'></script>
+<script  src="{{ url_for('static', filename='script.js') }}"></script>
+
+</body>
+</html>
