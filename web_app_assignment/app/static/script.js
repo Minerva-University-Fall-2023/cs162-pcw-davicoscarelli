@@ -22,20 +22,26 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 function fetchTasks() {
-  fetch('/tasks')
-      .then(response => response.json())
-      .then(tasks => {
-          tasks.forEach(task => {
-              const column = document.getElementById(task.column);
-              if (column) {
-                  const columnBody = column.querySelector('.card-list-body');
-                  const taskElement = createTaskElement(task);
-                  columnBody.appendChild(taskElement);
-              } else {
-                  console.error(`Column with ID "${task.column}" not found.`);
-              }
-          });
-      });
+    fetch('/tasks')
+        .then(response => response.json())
+        .then(tasks => {
+            tasks.forEach(task => {
+                const column = document.getElementById(task.column);
+                if (column) {
+                    const columnBody = column.querySelector('.card-list-body');
+                    const taskElement = createTaskElement(task);
+                    columnBody.appendChild(taskElement);
+                    if (task.subtasks && task.subtasks.length > 0) {
+                        task.subtasks.forEach(subtask => {
+                            const subtaskElement = createTaskElement(subtask);
+                            taskElement.appendChild(subtaskElement);
+                        });
+                    }
+                } else {
+                    console.error(`Column with ID "${task.column}" not found.`);
+                }
+            });
+        });
 }
 
 function createTaskElement(task) {

@@ -1,7 +1,6 @@
 from app import db
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
-from app import db
 
 
 class User(UserMixin, db.Model):
@@ -21,6 +20,8 @@ class Task(db.Model):
     title = db.Column(db.String(80), nullable=False)
     column = db.Column(db.String(80), default="Backlog")
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    parent_id = db.Column(db.Integer, db.ForeignKey('task.id'), nullable=True)
+    subtasks = db.relationship('Task', backref=db.backref('parent', remote_side=[id]))
 
     def to_dict(self):
         return {

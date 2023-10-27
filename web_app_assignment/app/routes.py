@@ -16,7 +16,8 @@ def index():
 @login_required
 def create_task():
     data = request.form
-    task = Task(title=data['title'], column="Backlog", user_id=current_user.id)
+    parent_id = data.get('parent_id', None)  # Get the parent_id if provided
+    task = Task(title=data['title'], column="Backlog", user_id=current_user.id, parent_id=parent_id)
     db.session.add(task)
     db.session.commit()
     return redirect(url_for('index'))
@@ -25,8 +26,13 @@ def create_task():
 @login_required
 def get_tasks():
     tasks = Task.query.filter_by(user_id=current_user.id).all()
-    print(current_user.username)
-    return jsonify([task.to_dict() for task in tasks])
+    hierarchical_tasks = []  # This will store the tasks in a hierarchical manner
+    for task in tasks:
+        task_dict = task.to_dict()
+        subtasks = Task.query.filter_by(parent_id=task.id).all()
+        task_dict['subtasks'] = [subtask.to_dict() for subtask in subtasks]
+        hierarchical_tasks.append(task_dict)
+    return jsonify(hierarchical_tasks)
 
 @app.route('/tasks/<int:task_id>', methods=['PUT'])
 @login_required
