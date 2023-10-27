@@ -46,12 +46,11 @@ function fetchTasks() {
 
 
 
-let parentTaskId = null;
-
-function setParentTaskId(id) {
-    console.log("AAAAAA", id)
-    parentTaskId = id;
+function setParentTaskId(taskId) {
+    localStorage.setItem('parentTaskId', taskId);
+    // $('#subtaskModal').modal('show');
 }
+
 
 function createTaskElement(task) {
     
@@ -76,15 +75,19 @@ function createTaskElement(task) {
 }
 
 function createSubtask() {
-    const subtaskTitle = document.getElementById('subtask-title').value;
-    const subtaskDescription = document.getElementById('subtask-description').value;
-    console.log("FILHA DA PUTAAA:", parentTaskId)
-    fetch('/create_task', {
+    const parentId = localStorage.getItem('parentTaskId');
+    const subtaskTitle = document.getElementById('subtaskTitle').value;
+    console.log("ENTROUUUU", parentId, subtaskTitle)
+    
+    // const subtaskDescription = document.getElementById('subtask-description').value;
+    
+
+    fetch('/tasks', {
         method: 'POST',
         body: JSON.stringify({
             title: subtaskTitle,
-            description: subtaskDescription,
-            parent_id: parentTaskId  // Ensure the parent task ID is sent
+            // description: subtaskDescription,
+            parent_id: parentId
         }),
         headers: {
             'Content-Type': 'application/json'
@@ -93,6 +96,7 @@ function createSubtask() {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
+            console.log("AAAAAA foooiii", data)
             fetchTasks();  // Refresh the tasks list
             $('#subtaskModal').modal('hide');  // Close the modal
         } else {
@@ -100,6 +104,7 @@ function createSubtask() {
         }
     });
 }
+
 
 
 
