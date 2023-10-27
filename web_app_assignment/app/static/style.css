@@ -21,11 +21,11 @@ body {
   min-height: 2rem;
 }
 .card-list-item {
+  overflow: hidden;
   position: relative;
   background: #dadada;
   margin-bottom: 1rem;
   padding: 1rem;
-  position: relative;
   border-radius: 10px;
 }
 .card-list-item-title {
@@ -81,9 +81,20 @@ body {
 
 .subtask {
   margin-left: 10px;
-  border-left: 2px solid #000000;
+  border-left: 2px solid #007bff;
   padding-left: 10px;
-  background-color: #a2a2a2;
+  background-color: #bebebe;
+  z-index: 1;
+}
+
+.task-button {
+  margin: 0; 
+  padding: 0; /* Adjust padding if necessary */
+}
+
+.subtask .task-button {
+  position: relative;
+  top: -5px; /* Adjust as needed */
 }
 
 
@@ -94,7 +105,7 @@ body {
 }
 
 .card-list-item button i {
-  color: #007bff;
+  color: #a3a3a3;
 }
 
 .auth-container {
