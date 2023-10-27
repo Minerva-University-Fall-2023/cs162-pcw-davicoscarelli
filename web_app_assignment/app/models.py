@@ -27,5 +27,6 @@ class Task(db.Model):
         return {
             "id": self.id,
             "title": self.title,
-            "column": self.column
+            "column": self.column,
+            "parent_id": self.parent_id
         }

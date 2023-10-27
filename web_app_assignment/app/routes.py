@@ -61,14 +61,11 @@ def get_tasks():
 def update_task(task_id):
     task = Task.query.get_or_404(task_id)
     data = request.json
-    print("FDPPPP", data)
-    # task.column = data['column']
+    print(data)
     task.parent_id = data['parent_id']
-    # if data['parent_id'] == None:
-    #         task.parent_id = None
-
-    
+    task.column = data['column']
     db.session.commit()
+    print(task.to_dict())
     return jsonify(task.to_dict())
 
 @app.route('/register', methods=['GET', 'POST'])
