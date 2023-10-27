@@ -16,8 +16,10 @@ def index():
 @login_required
 def create_task():
     data = request.form
-    print("AAAA", data.get('parent_id'))
+    print("AAAA", data)
     parent_id = data.get('parent_id', None) 
+    column = data.get('column', "Backlog") 
+    print("FILHA DA PUTA", column)
     if parent_id:
        
         parent_task = Task.query.get(parent_id)
@@ -26,10 +28,8 @@ def create_task():
         subtask = Task(title=data['title'], column=parent_task.column, user_id=current_user.id, parent_id=parent_id)
         parent_task.subtasks.append(subtask)
     else:
-        task = Task(title=data['title'], column="Backlog", user_id=current_user.id, parent_id=parent_id)
+        task = Task(title=data['title'], column=column, user_id=current_user.id, parent_id=parent_id)
         db.session.add(task) 
-    # task = Task(title=data['title'], column="Backlog", user_id=current_user.id, parent_id=parent_id)
-    # db.session.add(task)
     db.session.commit()
     return redirect(url_for('index'))
 
