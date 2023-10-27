@@ -65,3 +65,22 @@ body {
 .draggable--original {
   margin: 0 !important;
 }
+
+.container {
+  background-color: #222222;
+  padding: 20px;
+  border-radius: 10px;
+  color: white;
+  max-width: 400px;
+  margin: 50px auto;
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.btn-primary {
+  background-color: #555555;
+  border: none;
+}

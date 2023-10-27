@@ -1,13 +1,14 @@
 from app import app, db, login_manager
-from flask import render_template, redirect, url_for, request
+from flask import render_template, redirect, url_for, request, jsonify
 from .models import User, Task
-from flask_login import login_user, logout_user, login_required
+from flask_login import login_user, logout_user, login_required, current_user
 
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
 
 @app.route('/')
+@login_required
 def index():
     return render_template('index.html')
 
@@ -24,6 +25,7 @@ def create_task():
 @login_required
 def get_tasks():
     tasks = Task.query.all()
+    print(current_user.username)
     return jsonify([task.to_dict() for task in tasks])
 
 @app.route('/tasks/<int:task_id>', methods=['PUT'])
@@ -37,6 +39,8 @@ def update_task(task_id):
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
@@ -50,6 +54,8 @@ def register():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
