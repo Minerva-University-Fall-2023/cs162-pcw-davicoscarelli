@@ -62,9 +62,11 @@ def update_task(task_id):
     task = Task.query.get_or_404(task_id)
     data = request.json
     print("FDPPPP", data)
-    task.column = data['column']
-    if data['parent_id'] == None:
-            task.parent_id = None
+    # task.column = data['column']
+    task.parent_id = data['parent_id']
+    # if data['parent_id'] == None:
+    #         task.parent_id = None
+
     
     db.session.commit()
     return jsonify(task.to_dict())

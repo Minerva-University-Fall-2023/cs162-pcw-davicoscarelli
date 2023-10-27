@@ -1,6 +1,10 @@
 document.addEventListener("DOMContentLoaded", function() {
     fetchTasks();
 
+    let isSameColumn = false;
+    let current_task = null;
+    let target_task = null;
+
     var kanban = {
         sortableKanbanCards: new Draggable.Sortable(document.querySelectorAll('.kanban-col .card-list-body'), {
             plugins: [SwapAnimation.default],
@@ -14,23 +18,49 @@ document.addEventListener("DOMContentLoaded", function() {
         })
     };
 
-    kanban.sortableKanbanCards.on('sortable:stop', (event) => {
-        const taskId = event.data.dragEvent.data.source.dataset.id;
-        const newColumn = event.data.newContainer.parentElement.querySelector('.card-list-header').textContent.trim();
-        
-        // Check if the task was moved to a column or to another task
-        if (event.data.newContainer.classList.contains('card-list-body')) {
-            // Moved to a column, make it a standalone task
-            updateTaskParent(taskId, null, newColumn);
-        } else {
-            // Moved to another task, update its parent ID
-            const newParentId = event.data.newContainer.dataset.id;
-            updateTaskParent(taskId, newParentId, newColumn);
-        }
+    kanban.sortableKanbanCards.on('drag:start', (event) => {
+        isSameColumn = true; // Assume it's the same column until proven otherwise
+    });
 
-        // updateTaskColumn(taskId, newColumn);
+    kanban.sortableKanbanCards.on('drag:over', (event) => {
+        current_task = event.data.originalSource.dataset.id;
+        target_task = event.data.over.dataset.id;
+
+        const originalColumn = event.data.dragEvent.data.source.parentElement.parentElement.querySelector('.card-list-header').textContent.trim();
+        const newColumn = event.data.overContainer.parentElement.querySelector('.card-list-header').textContent.trim();
+
+        if (originalColumn !== newColumn) {
+            isSameColumn = false; // The task is being dragged to a different column
+        }
+    });
+
+    kanban.sortableKanbanCards.on('sortable:sort', (event) => {
+        if (isSameColumn) {
+            // If it's the same column, prevent the sorting
+            event.cancel();
+        }
+    });
+
+    kanban.sortableKanbanCards.on('sortable:stop', (event) => {
+        // const newColumn = event.data.newContainer.parentElement.querySelector('.card-list-header').textContent.trim();
+        const newColumn = "Doing"
+        // Check if the task was dropped inside another task
+        // if (target_task && !event.data.newContainer.classList.contains('card-list-body')) {
+            console.log("ENTROU 1")
+            console.log(current_task, target_task)
+            // The task was dropped on another task, so it should become a subtask of that task
+            updateTaskParent(current_task, target_task);
+        // } else {
+        //     console.log("ENTROU 2")
+        //     // The task was not dropped on another task, so it remains a standalone task
+        //     updateTaskParent(current_task, null, newColumn);
+        // }
     });
 });
+
+
+
+
 
 function fetchTasks() {
     fetch('/tasks')
@@ -85,7 +115,7 @@ function createTaskElement(task) {
     
     const taskTitle = document.createElement('a');
     taskTitle.href = '#';
-    taskTitle.innerHTML = `<h6>${task.title}</h6>`;
+    taskTitle.innerHTML = `<h6>${task.title + " "+ task.id}</h6>`;
 
     // Append title to the container
     taskContainer.appendChild(taskTitle);
@@ -295,13 +325,13 @@ function updateTaskColumn(taskId, column) {
   });
 }
 
-function updateTaskParent(taskId, parentId, column) {
+function updateTaskParent(taskId, parentId) {
     fetch(`/tasks/${taskId}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ parent_id: parentId, column: column })
+        body: JSON.stringify({ parent_id: parentId })
     })
     .then(response => response.json())
     .then(data => {

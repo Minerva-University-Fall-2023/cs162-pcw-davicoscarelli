@@ -112,6 +112,15 @@ body {
   color: #a3a3a3;
 }
 
+.card-list-item:hover {
+  border: 1px dashed #aaa;
+  background-color: #f7f7f7;
+}
+
+.card-list-item.drag-over {
+  background-color: #e0e0e0;
+}
+
 .auth-container {
   background-color: #222222;
   padding: 20px;
