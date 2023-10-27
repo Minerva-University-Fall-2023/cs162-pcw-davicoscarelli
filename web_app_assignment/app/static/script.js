@@ -45,20 +45,26 @@ function fetchTasks() {
 }
 
 function createSubtask(parentTaskId) {
-    const title = prompt("Enter subtask description:");
-    if (title) {
-        fetch('/tasks', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ title: title, parent_id: parentTaskId })
-        })
-        .then(response => response.json())
-        .then(data => {
-            fetchTasks(); // Refresh the tasks after adding a subtask
-        });
-    }
+    // Trigger a modal for subtask creation
+    $('#subtaskModal').modal('show');
+    $('#subtaskModalForm').off('submit').on('submit', function(e) {
+        e.preventDefault();
+        const title = $('#subtaskTitle').val();
+        if (title) {
+            fetch('/tasks', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ title: title, parent_id: parentTaskId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                fetchTasks(); // Refresh the tasks after adding a subtask
+                $('#subtaskModal').modal('hide');
+            });
+        }
+    });
 }
 
 function createTaskElement(task) {
@@ -71,10 +77,13 @@ function createTaskElement(task) {
         taskElement.classList.add('subtask');
     }
     taskElement.innerHTML = `
-        <a href="#"><h6>${task.title}</h6></a>
-        <button onclick="createSubtask(${task.id})">Add Subtask</button>
-        <p class="mt-4 mb-0"></p>
-    `;
+      <a href="#"><h6>${task.title}</h6></a>
+      <p class="mt-4 mb-0"></p>
+  `;
+    const subtaskButton = document.createElement('button');
+    subtaskButton.innerHTML = '<i class="fas fa-plus"></i>';
+    subtaskButton.onclick = function() { createSubtask(task.id); };
+    taskElement.appendChild(subtaskButton);
     return taskElement;
 }
 

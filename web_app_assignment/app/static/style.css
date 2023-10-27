@@ -68,8 +68,18 @@ body {
 
 .subtask {
   margin-left: 20px;
-  border-left: 2px solid #ddd;
+  border-left: 2px solid #ccc;
   padding-left: 10px;
+}
+
+.card-list-item button {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.card-list-item button i {
+  color: #007bff;
 }
 
 .auth-container {
