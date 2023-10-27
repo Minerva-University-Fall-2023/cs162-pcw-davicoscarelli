@@ -44,25 +44,28 @@ function fetchTasks() {
         });
 }
 
-function createSubtask(parentTaskId) {
-    // Trigger a modal for subtask creation
-    $('#subtaskModal').modal('show');
-    $('#subtaskModalForm').off('submit').on('submit', function(e) {
-        e.preventDefault();
-        const title = $('#subtaskTitle').val();
-        if (title) {
-            fetch('/tasks', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ title: title, parent_id: parentTaskId })
-            })
-            .then(response => response.json())
-            .then(data => {
-                fetchTasks(); // Refresh the tasks after adding a subtask
-                $('#subtaskModal').modal('hide');
-            });
+function createSubtask() {
+    const subtaskTitle = document.getElementById('subtask-title').value;
+    const subtaskDescription = document.getElementById('subtask-description').value;
+
+    fetch('/create_task', {
+        method: 'POST',
+        body: JSON.stringify({
+            title: subtaskTitle,
+            description: subtaskDescription,
+            parent_id: parentTaskId  // Send the parent task ID
+        }),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            fetchTasks();  // Refresh the tasks list
+            $('#subtaskModal').modal('hide');  // Close the modal
+        } else {
+            alert('Error creating subtask.');
         }
     });
 }

@@ -16,11 +16,36 @@ def index():
 @login_required
 def create_task():
     data = request.form
-    parent_id = data.get('parent_id', None)  # Get the parent_id if provided
+    parent_id = data.get('parent_id', None)  
     task = Task(title=data['title'], column="Backlog", user_id=current_user.id, parent_id=parent_id)
     db.session.add(task)
     db.session.commit()
     return redirect(url_for('index'))
+
+@app.route('/create_task', methods=['POST'])
+@login_required
+def create():
+    data = request.get_json()
+    title = data.get('title')
+    description = data.get('description')
+    parent_id = data.get('parent_id')  # Get the parent task ID
+
+    if not title:
+        return jsonify({'success': False, 'error': 'Title is required.'})
+
+    # If parent_id is provided, create a subtask
+    if parent_id:
+        parent_task = Task.query.get(parent_id)
+        if not parent_task:
+            return jsonify({'success': False, 'error': 'Parent task not found.'})
+        subtask = Task(title=title, description=description, user_id=current_user.id)
+        parent_task.subtasks.append(subtask)
+    else:
+        task = Task(title=title, description=description, user_id=current_user.id)
+        db.session.add(task)
+
+    db.session.commit()
+    return jsonify({'success': True})
 
 @app.route('/tasks', methods=['GET'])
 @login_required
