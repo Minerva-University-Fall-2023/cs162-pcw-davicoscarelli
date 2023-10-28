@@ -3,6 +3,13 @@
 ## Introduction
 This project is a web-based Kanban board application that allows users to manage tasks and subtasks in a visual manner.
 
+## Video Preview
+
+To get a visual overview of the application and its features, watch the video preview below:
+
+[![Web App Assignment Preview](http://img.youtube.com/vi/79FRWf-rn1Y/0.jpg)](http://www.youtube.com/watch?v=79FRWf-rn1Y "Web App Assignment Preview")
+
+
 ## Starting the Project
 To get started with the project, follow these steps:
 
