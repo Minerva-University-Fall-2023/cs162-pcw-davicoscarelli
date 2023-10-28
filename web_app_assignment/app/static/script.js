@@ -82,7 +82,6 @@ function fetchTasks() {
 
 
 
-
 function setParentTaskId(taskId) {
     localStorage.setItem('parentTaskId', taskId);
 }
@@ -98,6 +97,7 @@ function createTaskElement(task) {
     }
 
     const taskContainer = document.createElement('div');
+    const buttonsContainer = document.createElement('div');
     taskContainer.classList.add('task-container');
     
     const taskTitle = document.createElement('a');
@@ -113,26 +113,46 @@ function createTaskElement(task) {
         newSubtaskButton.setAttribute('data-toggle', 'modal');
         newSubtaskButton.setAttribute('data-target', '#subtaskModal');
         newSubtaskButton.onclick = function() { setParentTaskId(task.id); };
-        taskContainer.appendChild(newSubtaskButton);
+        buttonsContainer.appendChild(newSubtaskButton);
     }
-
-    const editTaskButton = document.createElement('button');
-    editTaskButton.innerHTML = '<i class="fas fa-edit"></i>';
-    editTaskButton.classList.add('btn', 'btn-sm', 'btn-outline-secondary', 'task-button');
-    taskContainer.appendChild(editTaskButton);
 
     const deleteTaskButton = document.createElement('button');
     deleteTaskButton.innerHTML = '<i class="fas fa-trash"></i>';
     deleteTaskButton.classList.add('btn', 'btn-sm', 'btn-outline-secondary', 'task-button');
-    taskContainer.appendChild(deleteTaskButton);
+    deleteTaskButton.addEventListener('click', function() {
+        const taskId = task.id;
+        deleteTask(taskId);
+    });
+    buttonsContainer.appendChild(deleteTaskButton);
 
+    taskContainer.appendChild(buttonsContainer)
     taskElement.appendChild(taskContainer);
+    
 
     return taskElement;
 }
 
 
 
+function deleteTask(taskId) {
+    fetch(`/tasks/${taskId}`, {
+        method: 'DELETE',
+    })
+    .then(response => {
+        if (response.ok) {
+            const taskElement = document.querySelector(`[data-id="${taskId}"]`);
+            if (taskElement) {
+                taskElement.remove();
+            }
+            console.log(`Task ${taskId} deleted`);
+        } else {
+            console.error(`Failed to delete task ${taskId}`);
+        }
+    })
+    .catch(error => {
+        console.error(`Error deleting task: ${error}`);
+    });
+}
 
 
 function updateTaskColumn(taskId, column) {

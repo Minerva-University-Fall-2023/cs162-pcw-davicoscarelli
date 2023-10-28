@@ -10,16 +10,16 @@ def load_user(user_id):
 @app.route('/')
 @login_required
 def index():
-    return render_template('index.html')
+    return render_template('index.html', user=current_user)
 
 @app.route('/tasks', methods=['POST'])
 @login_required
 def create_task():
     data = request.form
-    print("AAAA", data)
+    
     parent_id = data.get('parent_id', None) 
     column = data.get('column', "Backlog") 
-    print("FILHA DA PUTA", column)
+    
     if parent_id:
        
         parent_task = Task.query.get(parent_id)
@@ -39,12 +39,10 @@ def create_task():
 def get_tasks():
     tasks = Task.query.filter_by(user_id=current_user.id).all()
 
-    # Convert tasks to a dictionary for easy lookup
     task_dict = {task.id: task.to_dict() for task in tasks}
     for task in tasks:
         task_dict[task.id]['subtasks'] = []
 
-    # Build the hierarchy
     top_level_tasks = []
     for task in tasks:
         if task.parent_id is None:
@@ -61,24 +59,31 @@ def get_tasks():
 def update_task(task_id):
     task = Task.query.get_or_404(task_id)
     data = request.json
-    print("FDPPPP", data)
-    # task.column = data['column']
     task.parent_id = data['parent_id']
-    # if data['parent_id'] == None:
-    #         task.parent_id = None
-
     
     db.session.commit()
     return jsonify(task.to_dict())
+
+@app.route('/tasks/<int:task_id>', methods=['DELETE'])
+@login_required
+def delete_task(task_id):
+    task = Task.query.get_or_404(task_id)
+    
+    db.session.delete(task)
+    db.session.commit()
+
+    return jsonify({'message': 'Task deleted successfully'})
+
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if current_user.is_authenticated:
         return redirect(url_for('index'))
     if request.method == 'POST':
-        username = request.form.get('username')
+        name = request.form.get('name')
+        email = request.form.get('email')
         password = request.form.get('password')
-        user = User(username=username)
+        user = User(email=email, name=name)
         user.set_password(password)
         db.session.add(user)
         db.session.commit()
@@ -91,14 +96,13 @@ def login():
     if current_user.is_authenticated:
         return redirect(url_for('index'))
     if request.method == 'POST':
-        username = request.form.get('username')
+        email = request.form.get('email')
         password = request.form.get('password')
-        user = User.query.filter_by(username=username).first()
+        user = User.query.filter_by(email=email).first()
         if user and user.check_password(password):
             login_user(user)
             return redirect(url_for('index'))
         else:
-            # Handle login error (e.g., flash a message)
             pass
     return render_template('login.html')
 

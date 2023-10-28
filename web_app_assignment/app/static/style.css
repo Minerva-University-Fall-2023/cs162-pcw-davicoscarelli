@@ -74,9 +74,9 @@ body {
 
 .task-container {
   display: flex;
-  justify-content: space-between; /* Title on the left, menu on the right */
-  align-items: center; /* Vertically center items */
-  width: 100%; /* Take up the full width of the parent element */
+  justify-content: space-between; 
+  align-items: center; 
+  width: 100%; 
 }
 
 .subtask {
@@ -88,17 +88,17 @@ body {
 }
 
 .sub-subtask {
-  background: #dadada; /* Light grey */
+  background: #dadada; 
 }
 
 .task-button {
-  margin: 0; 
-  padding: 0; /* Adjust padding if necessary */
+  margin-left: 0.5rem; 
+  padding: 0; 
 }
 
 .subtask .task-button {
   position: relative;
-  top: -5px; /* Adjust as needed */
+  top: -5px; 
 }
 
 
