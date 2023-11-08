@@ -1,0 +1,22 @@
+<!-- templates/dashboard.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard</title>
+</head>
+<body>
+    <h1>Dashboard</h1>
+    <form method="post">
+        Expression: <input type="text" name="expression" required>
+        <input type="submit" value="Evaluate">
+    </form>
+    <h2>History</h2>
+    <ul>
+        {% for expr in expressions %}
+            <li>{{ expr.content }} = {{ expr.result }}</li>
+        {% endfor %}
+    </ul>
+    <a href="{{ url_for('logout') }}">Logout</a>
+</body>
+</html>
