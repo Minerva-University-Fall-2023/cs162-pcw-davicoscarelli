@@ -1,0 +1,3 @@
+CONTAINER ID   IMAGE                COMMAND                  CREATED          STATUS          PORTS                                       NAMES
+3a41b47e8b72   simple-cs162-flask   "python app.py"          49 seconds ago   Up 49 seconds   0.0.0.0:5162->5162/tcp, :::5162->5162/tcp   simple-cs162-instance
+fe1da422a615   postgres             "docker-entrypoint.s…"   2 years ago      Up 7 days       0.0.0.0:5432->5432/tcp, :::5432->5432/tcp   postgres
