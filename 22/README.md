@@ -10,7 +10,6 @@ fe1da422a615   postgres             "docker-entrypoint.s…"   2 years ago      
 The changes collectively suggest a significant shift in the project's backend infrastructure, particularly moving from a simpler SQLite database to a more robust PostgreSQL setup. The introduction of Docker Compose and changes in the Dockerfile indicate a move towards a more complex, production-oriented containerized environment. The adjustments in app.py and parse.py reflect these backend changes.
 
 
-
 # Components:
 
 1. **Web Application (app.py)**:
