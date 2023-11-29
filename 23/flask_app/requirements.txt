@@ -1,7 +1,7 @@
 Flask
 Flask-Login
 Flask-SQLAlchemy
-Werkzeug
+werkzeug==0.16.1
 pytest
 pytest-cov
 coverage
