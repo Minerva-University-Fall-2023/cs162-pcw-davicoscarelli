@@ -1,7 +1,7 @@
 # test_simple_math.py
 
 import pytest
-from simple_math import app, db, User, Expression
+from flask_app.simple_math import app, db, User, Expression
 
 @pytest.fixture
 def client():
